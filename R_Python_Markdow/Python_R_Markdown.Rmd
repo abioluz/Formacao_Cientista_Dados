@@ -1,0 +1,69 @@
+---
+title: "Trabalhando com o Python no markdown"
+author: "Abioluz Robson Behrend"
+date: "2023-08-27"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+
+use_virtualenv("/home/abioluz/Documentos/Cursos/Formacao_Cientista_Dados/venv/")
+
+```
+
+## R Markdown
+
+https://rstudio.github.io/reticulate/
+https://bookdown.org/yihui/rmarkdown-cookbook/
+https://bookdown.org/yihui/rmarkdown
+
+
+knitr::opts_chunk$set(engine.path = list(
+  python = '/home/abioluz/Documentos/Cursos/Formacao_Cientista_Dados/venv/bin/python'
+))
+use_virtualenv("/home/abioluz/Documentos/Cursos/Formacao_Cientista_Dados/venv/")
+use_python("/home/abioluz/Documentos/Cursos/Formacao_Cientista_Dados/venv/bin/python")
+
+{python engine.path="/home/abioluz/Documentos/Cursos/Formacao_Cientista_Dados/venv/bin/python"}
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+```{python}
+import sys
+print(sys.path)
+# sys.path.append("/home/abioluz/Documentos/Cursos/Formacao_Cientista_Dados/venv/bin/python")
+
+import pandas as pd
+print('oi')
+a = 20
+data = {
+  "calories": [420, 380, 390],
+  "duration": [50, 40, 45]}
+b = pd.DataFrame(data)
+print(b)
+```
+
+
+```{r cars}
+
+summary(cars)
+
+pd <- import("pandas")
+a <- pd$DataFrame(py$data)
+print(a)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
