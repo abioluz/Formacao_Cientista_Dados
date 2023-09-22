@@ -1,0 +1,135 @@
+---
+title: "Estatística II"
+author: "Abioluz Robson Behrend"
+date: "2023-08-30"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+use_virtualenv('/home/abioluz/Documentos/Cursos/Formacao_Cientista_Dados/venv')
+```
+
+```{python}
+from scipy.stats import t
+
+```
+
+# Distribuição T de Student
+
+Uma pesquisa mostra que cientistas de dados ganham R\$75,00 por hora. Uma amostra de 9 cientistas é selecionada e perguntado o salário. O desvio padrão da amostra é de 10.
+
+graus de liberdade = 8
+
+```{r}
+media_pop = 75
+X <- 80
+S = 10
+n = 9
+gl = 8
+
+t = (X - media_pop) / (S / sqrt(n))
+
+print(t)
+
+```
+
+O Resultado do cálculo de t é `r t`
+
+
+```{python}
+media_pop = 75
+X = 80
+S = 10
+n = 9
+gl = 8
+
+t = (X - media_pop) / (S / (n**0.5))
+
+print(t)
+
+```
+
+O Resultado do cálculo de t é `r py$t`
+
+
+
+## Calcular a probabilidade:
+
+1) Qual a probabilidade do salário ser menor que R\$80,00 a hora?
+
+
+```{r}
+t1 = pt(1.5,8)
+```
+R: A probabilidade do salário ser menor que R\$80,00 a hora é: `r t1`
+
+
+```{python}
+t1 = t.cdf(1.5,8)
+print(t1)
+```
+R: A probabilidade do salário ser menor que R\$80,00 a hora é: `r py$t1`
+
+
+
+2) Qual a probabilidade do salário ser maior que R\$80,00 a hora?
+
+```{r}
+pt(1.5, 8, lower.tail = F)
+1-pt(1.5,8)
+
+```
+
+```{python}
+t.sf(1.5, 8)
+1-t.cdf(1.5,8)
+
+```
+
+
+
+3) Somando as duas probabilidades
+
+```{r}
+pt(1.5, 8, lower.tail = F) + pt(1.5,8)
+
+```
+
+```{python}
+t.sf(1.5, 8) + t.cdf(1.5,8)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,87 @@
+---
+title: "Curso de R"
+author: "Abioluz Robson Behrend"
+date: "2023-08-29"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+```
+
+# Estudos de R - Apresentação
+
+## Tipos de dados
+
+-   Caracteres
+-   Numéricos
+-   Inteiros
+-   Fator
+
+A declaração é feita de forma implícita e usando tanto o \<-, -\> ou =
+
+```{r}
+a <- 'Abacaxi'
+'Pera' -> b
+c = 'Maçã'
+
+sprintf('Variável a: %s',a)
+sprintf('Variável b: %s',b)
+sprintf('Variável c: %s',c)
+```
+
+-   Alterar o diretório padrão
+
+```{r}
+real = 8
+inteiro = 8L # tem que colocar o L para ser considerado como inteiro
+logico = TRUE
+logico = F
+caracteres = 'Texto'
+
+```
+
+-   E uma linguagem vetorial, onde menso qualquer variável fica na posição 1
+
+-   Para obter informação sobre um objeto
+
+```{r}
+real[1]
+```
+
+## Operadores:
+
+### Aritméticos
+
+-   Adição (+)
+-   Subtração (-)
+-   Multiplicação (\*)
+-   Divisão (/)
+-   Potência (\^)
+-   modo (%%)
+-   Divisão de inteiros (%/%)
+
+### Lógicos
+
+-   maior (\>)
+-   menor (\<)
+-   maior igual (\>=)
+-   menor igual (\<=)
+-   igual (==)
+-   diferente (!=)
+-   not (!)
+-   ou (\|)
+-   and (&)
+
+## Opreações Matemáticas
+
+-   Raiz quadrada: sqrt()
+-   Soma: sum()
+-   Logaritmo base 10: log()
+-   Coseno: cos()
+-   Seno: sin()
+-   Tangente: tan()
+-   Exponencial: exp()
+
+

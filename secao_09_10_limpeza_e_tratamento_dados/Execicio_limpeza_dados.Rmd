@@ -1,0 +1,238 @@
+---
+title: "Limpeza dos Dados"
+author: "Abioluz Robson Behrend"
+date: "2023-09-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+use_virtualenv('/home/abioluz/Documentos/Cursos/Formacao_Cientista_Dados/venv')
+# options(scipen = 999) # Para evitar notação cientifíca no p-value
+# options(scipen=T) # Para voltar notação cientifíca no p-value
+```
+
+# Tratamento e Limpeza de Dados
+
+## Abrindo o arquivo
+
+```{r}
+# Importando os dados, string vazio como NA, string como fatores
+# na.strings=""  >>> quando encontrar campo vaziu, importa como NA
+# stringsAsFactors=T >>> importa as strings como fatores
+
+dados <- read.csv("Churn.csv", sep=";", na.strings="", stringsAsFactors=T)
+
+head(dados)
+summary(dados)
+```
+
+## Atribuindo colunas
+
+```{r}
+colnames(dados) = c("Id", "Score", "Estado", "Genero", "Idade", "Patrimonio", "Saldo", "Produtos", "TemCartCredito", "Ativo", "Salario", "Saiu")
+
+head(dados)
+```
+
+## Explorar dados Categóricos
+
+```{r}
+# Estados
+counts = table(dados$Estado)
+barplot(counts, main="Estados", xlab="Estados")
+
+# Gênero
+counts = table(dados$Genero)
+barplot(counts, main='Genero', xlab='Genero')
+```
+
+## Explorando dados numéricos
+
+### Score
+
+```{r}
+summary(dados$Score)
+boxplot(dados$Score)
+hist(dados$Score)
+
+```
+
+### Idade
+
+```{r}
+summary(dados$Idade)
+boxplot(dados$Idade)
+hist(dados$Idade)
+
+```
+
+### Saldo
+
+```{r}
+summary(dados$Saldo)
+boxplot(dados$Saldo)
+hist(dados$Saldo)
+
+
+```
+
+### Salário
+
+```{r}
+summary(dados$Salario)
+boxplot(dados$Salario)
+boxplot(dados$Salario, outline=F)
+hist(dados$Salario)
+
+
+```
+
+# Tratamento de Dados Faltantes
+
+## Visualizar Valores faltantes
+
+```{r}
+#valores faltantes NA
+
+dados[!complete.cases(dados),]
+```
+
+### Salarios
+
+```{r}
+
+summary(dados$Salario)
+
+# Obter a mediana
+# na.rm=T >>> evita que retorne na
+mediana = median(dados$Salario, na.rm=T)
+
+# Atribuir a mediana nas NAS
+dados[is.na(dados$Salario),]$Salario = mediana
+
+# Procurar dados NA em Salario para verificar
+
+dados[!complete.cases(dados$Salario),]
+
+
+```
+
+### Falta de padronização em Gênero
+
+```{r}
+# Ver Valores
+unique(dados$Genero)
+
+summary(dados$Genero)
+
+# Transformar M e NA em Masculino (moda)
+dados[is.na(dados$Genero) | dados$Genero == 'M',]$Genero = 'Masculino'
+  
+# Transformar F e Fem em Feminino
+dados[dados$Genero == 'F' | dados$Genero == 'Fem',]$Genero = 'Feminino'
+
+# Ver resultados 
+summary(dados$Genero)
+
+# O sumário ainda aparece os levels não utilizados
+#         F       Fem  Feminino         M Masculino 
+#        0         0       464         0       535 
+
+dados$Genero = factor(dados$Genero)
+
+# Verificar a remoção do sumário
+
+summary(dados$Genero)
+  
+```
+
+### Idades fora do domínio
+
+```{r}
+summary(dados$Idade)
+
+# ver os dados fora do intervalo outlines
+dados[dados$Idade<0 | dados$Idade>110 ,]$Idade
+
+# Verificar se há dados NA
+dados[is.na(dados$Idade),]
+
+# Pegar a mediana
+mediana = median(dados$Idade, na.rm=T)
+mediana
+
+# substiruição dos outlines pela mediana 
+dados[dados$Idade<0 | dados$Idade>110,]$Idade = mediana
+
+#verificar se houve substituição
+dados[dados$Idade<0 | dados$Idade>110,]$Idade
+
+summary(dados$Idade)
+```
+
+## Dados duplicados
+
+```{r}
+# Buscar duplicados pelo ID
+x = dados[duplicated(dados$Id),]
+x
+
+# excluir pelo ID e não pelo Indice
+dados = dados[-c(x$Id),]
+
+# Buscamos a linha que estava duplicada
+dados[dados$Id == x$Id,]
+
+#verificar novamente os dados duplicados
+dados[duplicated(dados$Id),]
+
+```
+
+## Estados fora do dominio
+
+```{r}
+# fora do dominio - Categórico
+unique(dados$Estado)
+summary(dados$Estado)
+
+# preencher com a moda
+dados[!dados$Estado %in% c('RS','SC','PR'),]$Estado = 'RS'
+summary(dados$Estado)
+
+# Removendo fatores não usados
+dados$Estado = factor(dados$Estado)
+
+# Visualizar novamente
+summary(dados$Estado)
+head(dados)
+```
+
+## Outliers
+
+```{r}
+#  Outliers, criando um parametro com desvio padrão
+desv = sd(dados$Salario, na.rm=T)
+
+dados[dados$Salario >= 2*desv, ]$Salario
+
+boxplot(dados$Salario)
+        
+x= boxplot(dados$Salario)$out
+x
+
+# atualizamos todos para a mediana
+dados[dados$Salario >= 2*desv,]$Salario = median(dados$Salario)
+
+dados[dados$Salario >= 2*desv, ]$Salario
+
+boxplot(dados$Salario)
+```
+
+
+
+
+
+
+

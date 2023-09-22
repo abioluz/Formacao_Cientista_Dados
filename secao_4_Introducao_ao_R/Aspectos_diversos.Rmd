@@ -1,0 +1,60 @@
+---
+title: "Curso de R"
+author: "Abioluz Robson Behrend"
+date: "2023-08-29"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+```
+
+# Estudos de R - Apresentação
+
+## Diretório de Trabalho
+
+-   Local onde o R busca por padrão os arquivos
+
+-   Ideal para não precisar informar caminhos absolutos
+
+-   Saber o diretório padrão
+
+```{r}
+getwd()
+```
+
+-   Alterar o diretório padrão
+
+```{r}
+setwd('/home')
+getwd()
+```
+
+## Classes
+
+-   Para obter informação sobre um objeto
+
+```{r}
+class(iris)
+```
+
+## Salvando e Carregando objetos
+
+- Muito útil para salvar objetos que estaja trabalhando e depois poder voltar a trabalhar com eles
+
+```{r}
+save(objeto, file='arquivo.Rdata')
+load(file='arquivo.Rdata')
+```
+
+
+## Visualização de Dados
+
+```{r}
+# função genérica
+plot()
+hist()
+boxplot()
+```
+

@@ -1,0 +1,72 @@
+---
+title: "Regressão Linear"
+author: "Abioluz Robson Behrend"
+date: "2023-09-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+use_virtualenv('/home/abioluz/Documentos/Cursos/Formacao_Cientista_Dados/venv')
+# options(scipen = 999) # Para evitar notação cientifíca no p-value
+# options(scipen=T) # Para voltar notação cientifíca no p-value
+
+# install.packages("corrgram")
+# library(corrgram)
+# library(corrgram)
+# mtcars
+```
+# Obter os dados
+
+```{r}
+dados = read.csv('slr12.csv', sep=";")
+head(dados)
+```
+
+
+# Correlação
+
+
+```{r}
+cor(dados)
+corrgram(dados, order=T, lower.panel=panel.shade, 
+         upper.panel = panel.pie, text.panel = panel.txt,
+         main="Carros")
+```
+
+Analisamos cilindradas vs consumo
+
+
+
+```{r}
+plot(dados$CusInic ~ dados$FrqAnual, ylab='Investimento inicial', xlab='Taxa Anual', main='Franquia')
+
+# lm(target ~ preditoras)
+# ln(y ~ x1 + x2 + x3, data=dados)
+
+modelo = lm(CusInic ~ FrqAnual, data=dados)
+abline(modelo)
+```
+
+
+Coeficiente de Determinação (71% de variável dependente é explicada pela variável explanatória)
+R2 ajustado
+
+```{r}
+modelo
+summary(modelo)
+summary(modelo)$r.squared
+summary(modelo)$adj.r.squared
+
+```
+```{r}
+valor = 1300
+prev = predict(modelo, data.frame(FrqAnual=valor))
+
+prev = paste0("Previsão de custo inicial RS: ", round(prev, 2))
+print(prev)
+```
+
+
+

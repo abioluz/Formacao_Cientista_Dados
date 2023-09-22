@@ -1,0 +1,61 @@
+---
+title: "Estatística II"
+author: "Abioluz Robson Behrend"
+date: "2023-08-30"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+use_virtualenv('/home/abioluz/Documentos/Cursos/Formacao_Cientista_Dados/venv')
+```
+
+```{python}
+import numpy as np
+from scipy.stats import chi2_contingency
+
+```
+
+# Qui Quadrado
+
+Criamos o conjunto de dados para teste
+```{r}
+novela = matrix(c(19,6,43,32),nrow=2, byrow=T)
+rownames(novela) = c("Masculino","Feminino")
+colnames(novela) = c("Assiste","NaoAssiste")
+novela
+```
+```{python}
+novela = np.array([[19,6],[43,32]])
+novela
+```
+
+Executar Quiquadrado
+Valor de p é maior que 0,05 não há evidências de diferença significativa (hipótese nula)
+```{r}
+chisq.test(novela)
+```
+
+```{python}
+chi2_contingency(novela)
+```
+
+
+Alteramos a proporção de homens que assiste e não 
+Executamos o teste novamente, agora valor de p menor que 0,05
+```{r}
+novela = matrix(c(22,3,43,32),nrow=2, byrow=T)
+rownames(novela) = c("Masculino","Feminino")
+colnames(novela) = c("Assiste","NaoAssiste")
+novela
+chisq.test(novela)
+```
+
+```{python}
+novela = np.array([[22,3],[43,32]])
+chi2_contingency(novela)
+```

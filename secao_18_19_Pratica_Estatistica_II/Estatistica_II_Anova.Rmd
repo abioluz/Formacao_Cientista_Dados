@@ -1,0 +1,107 @@
+---
+title: "Estatística II"
+author: "Abioluz Robson Behrend"
+date: "2023-08-30"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+use_virtualenv('/home/abioluz/Documentos/Cursos/Formacao_Cientista_Dados/venv')
+```
+
+```{python}
+# !pip install statsmodels
+import pandas as pd
+from scipy import stats
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+from statsmodels.stats.multicomp import MultiComparison
+from IPython.display import display
+import matplotlib.pyplot as plot
+
+```
+
+# Anova
+Carrega dados
+```{r}
+tratamento = read.csv("anova.csv", sep=";")
+tratamento
+```
+
+
+```{python}
+tratamento = pd.read_csv('anova.csv', sep=';')
+display(tratamento)
+
+```
+
+
+
+Visulizamos os distribuição dos remedios por horas
+```{r}
+boxplot(tratamento$Horas ~ tratamento$Remedio)
+```
+
+```{python}
+tratamento.boxplot(by='Remedio', grid=False)
+plot.show()
+```
+
+
+
+Executamos Análise de variância
+Observar valor de p maior que 0,05 (Pr(>F))
+Hipótese nula de que não há diferença significativa
+```{r}
+an =  aov(Horas ~ Remedio, data=tratamento)
+summary(an)
+```
+
+```{python}
+modelo1 = ols('Horas ~ Remedio', data=tratamento).fit()
+resultado1 = sm.stats.anova_lm(modelo1)
+resultado1
+```
+
+
+
+Anova de dois fatores
+Nenhum valor de P mostra diferença significativa
+```{r}
+an =  aov(Horas ~ Remedio * Sexo, data=tratamento)
+summary(an)
+```
+
+```{python}
+modelo2 = ols('Horas ~ Remedio * Sexo', data=tratamento).fit()
+resultado2 = sm.stats.anova_lm(modelo2)
+resultado2
+```
+
+
+Se houver diferença o teste de Tukey é executado
+```{r}
+tukey = TukeyHSD(an)
+tukey
+```
+```{r}
+plot(tukey)
+```
+
+```{python}
+mc = MultiComparison(tratamento['Horas'], tratamento['Remedio'])
+resultado_teste = mc.tukeyhsd()
+print(resultado_teste)
+```
+
+
+
+```{python}
+figura = resultado_teste.plot_simultaneous()
+plot.show()
+```
