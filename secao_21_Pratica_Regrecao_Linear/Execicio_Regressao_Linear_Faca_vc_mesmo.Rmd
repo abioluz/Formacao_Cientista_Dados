@@ -14,7 +14,7 @@ use_virtualenv('/home/abioluz/Documentos/Cursos/Formacao_Cientista_Dados/venv')
 
 # install.packages("corrgram")
 # library(corrgram)
-# library(corrgram)
+library(corrgram)
 # mtcars
 ```
 # Obter os dados

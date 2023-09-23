@@ -1,234 +1,256 @@
 ---
-title: "Limpeza dos Dados"
+title: "Exercicio_limpeza_dados"
 author: "Abioluz Robson Behrend"
-date: "2023-09-09"
+date: "2023-09-22"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(reticulate)
-use_virtualenv('/home/abioluz/Documentos/Cursos/Formacao_Cientista_Dados/venv')
-# options(scipen = 999) # Para evitar notação cientifíca no p-value
-# options(scipen=T) # Para voltar notação cientifíca no p-value
+
+# Biblioteca para gráfico de correlação
+# library(corrgram)
+library(corrgram)
+
+# Biblioteca para modelos de ML
+# install.packages('e1071')
+library(e1071)
+
 ```
 
-# Tratamento e Limpeza de Dados
+# Tratamento e Lipeza de dados
 
-## Abrindo o arquivo
+---
+*Dados do Projeto:*
+
+Aparência: sol, nublado, chuva
+Temperatura: -130 ~ 130F
+Umidade: 0 ~ 100
+Jogar: sim/não
+---
+
 
 ```{r}
-# Importando os dados, string vazio como NA, string como fatores
-# na.strings=""  >>> quando encontrar campo vaziu, importa como NA
-# stringsAsFactors=T >>> importa as strings como fatores
-
-dados <- read.csv("Churn.csv", sep=";", na.strings="", stringsAsFactors=T)
-
+dados = read.csv('tempo.csv', sep=';', stringsAsFactors=T)
 head(dados)
 summary(dados)
-```
 
-## Atribuindo colunas
-
-```{r}
-colnames(dados) = c("Id", "Score", "Estado", "Genero", "Idade", "Patrimonio", "Saldo", "Produtos", "TemCartCredito", "Ativo", "Salario", "Saiu")
-
-head(dados)
-```
-
-## Explorar dados Categóricos
-
-```{r}
-# Estados
-counts = table(dados$Estado)
-barplot(counts, main="Estados", xlab="Estados")
-
-# Gênero
-counts = table(dados$Genero)
-barplot(counts, main='Genero', xlab='Genero')
-```
-
-## Explorando dados numéricos
-
-### Score
-
-```{r}
-summary(dados$Score)
-boxplot(dados$Score)
-hist(dados$Score)
-
-```
-
-### Idade
-
-```{r}
-summary(dados$Idade)
-boxplot(dados$Idade)
-hist(dados$Idade)
-
-```
-
-### Saldo
-
-```{r}
-summary(dados$Saldo)
-boxplot(dados$Saldo)
-hist(dados$Saldo)
-
-
-```
-
-### Salário
-
-```{r}
-summary(dados$Salario)
-boxplot(dados$Salario)
-boxplot(dados$Salario, outline=F)
-hist(dados$Salario)
-
-
-```
-
-# Tratamento de Dados Faltantes
-
-## Visualizar Valores faltantes
-
-```{r}
-#valores faltantes NA
+# Ver valores faltantes
 
 dados[!complete.cases(dados),]
 ```
 
-### Salarios
+
+## Tratar as variáveis categóricas
 
 ```{r}
+aparencia = table(dados$Aparencia)
+barplot(aparencia, main='Aparência', xlab='Aparências')
+print(summary(dados$Aparencia))
 
-summary(dados$Salario)
+# Ver categorias
+unique(dados$Aparencia)
+
+# ver dados NA ou vazio
+dados[is.na(dados$Aparencia) | dados$Aparencia=='',]
+
+
+# Trocar os dados de menos pela moda. No caso será chuva
+dados[dados$Aparencia == 'menos',]$Aparencia = 'chuva'
+
+# Remover o sumário excluido
+dados$Aparencia = factor(dados$Aparencia)
+
+summary(dados$Aparencia)
+
+aparencia2 = table(dados$Aparencia)
+barplot(aparencia2, main='Aparência tratada', xlab='Aparências')
+
+```
+
+```{r}
+vento = table(dados$Vento)
+barplot(vento, main='Vento', xlab='vento')
+
+print(summary(dados$Vento))
+
+# ver dados únicos
+unique(dados$Vento)
+
+# Ver valores NA ou em Brancos
+dados[is.na(dados$Vento) | dados$Vento == '',]
+
+# Atribuir moda ao valor em branco
+dados[dados$Vento == '',]$Vento = 'FALSO'
+
+# Remover sumário em branco
+dados$Vento = factor(dados$Vento)
+
+# Verificar alterações
+print(summary(dados$Vento))
+vento2 = table(dados$Vento)
+barplot(vento2, main='Vento2', xlab='vento')
+
+
+```
+```{r}
+jogar = table(dados$Jogar)
+jogar
+barplot(jogar, main='Jogar')
+summary(dados$Jogar)
+
+# Verificar valores únicos
+unique(dados$Jogar)
+
+# Verificar valores vazio ou NA
+dim(dados[is.na(dados$Jogar) | dados$Jogar == '',])
+
+
+
+```
+
+## Tratamento de dados numéricos
+
+
+```{r}
+summary(dados$Temperatura)
+outlies = boxplot(dados$Temperatura, main='Temperatura', ylab='Temperatura em ºF')
+hist(dados$Temperatura, main='Temperatura', xlab='Temperatura em ºF')
+
+# Verificar dados fora do escopo (outlies)
+
+dados[dados$Temperatura < -130 | dados$Temperatura > 130,]
+outlies$out
 
 # Obter a mediana
-# na.rm=T >>> evita que retorne na
-mediana = median(dados$Salario, na.rm=T)
-
-# Atribuir a mediana nas NAS
-dados[is.na(dados$Salario),]$Salario = mediana
-
-# Procurar dados NA em Salario para verificar
-
-dados[!complete.cases(dados$Salario),]
-
-
-```
-
-### Falta de padronização em Gênero
-
-```{r}
-# Ver Valores
-unique(dados$Genero)
-
-summary(dados$Genero)
-
-# Transformar M e NA em Masculino (moda)
-dados[is.na(dados$Genero) | dados$Genero == 'M',]$Genero = 'Masculino'
-  
-# Transformar F e Fem em Feminino
-dados[dados$Genero == 'F' | dados$Genero == 'Fem',]$Genero = 'Feminino'
-
-# Ver resultados 
-summary(dados$Genero)
-
-# O sumário ainda aparece os levels não utilizados
-#         F       Fem  Feminino         M Masculino 
-#        0         0       464         0       535 
-
-dados$Genero = factor(dados$Genero)
-
-# Verificar a remoção do sumário
-
-summary(dados$Genero)
-  
-```
-
-### Idades fora do domínio
-
-```{r}
-summary(dados$Idade)
-
-# ver os dados fora do intervalo outlines
-dados[dados$Idade<0 | dados$Idade>110 ,]$Idade
-
-# Verificar se há dados NA
-dados[is.na(dados$Idade),]
-
-# Pegar a mediana
-mediana = median(dados$Idade, na.rm=T)
+mediana = median(dados$Temperatura, na.rm=T)
 mediana
 
-# substiruição dos outlines pela mediana 
-dados[dados$Idade<0 | dados$Idade>110,]$Idade = mediana
+dados$Temperatura
 
-#verificar se houve substituição
-dados[dados$Idade<0 | dados$Idade>110,]$Idade
+# Cuidado! 
+# dados[dados$Temperatura <-130 | >> isso atribui o valor ao invés de fazer a operação lógica
+# Para corrigir é necessário afaztar o "<" do "-" com um espaço
+# dados[dados$Temperatura < -130 |
+# Ou com parenteses
+# dados[dados$Temperatura < (-130) |
+dados[dados$Temperatura<(-130) | dados$Temperatura>130,]$Temperatura = mediana
 
-summary(dados$Idade)
+# Verificar valores NA
+dados[!complete.cases(dados$Temperatura),]
+dados[is.na(dados$Temperatura)]
+
+boxplot(dados$Temperatura, main='Temperatura', ylab='Temperatura em ºF')
+hist(dados$Temperatura, main='Temperatura', xlab='Temperatura em ºF')
+
+
 ```
 
-## Dados duplicados
+
 
 ```{r}
-# Buscar duplicados pelo ID
-x = dados[duplicated(dados$Id),]
-x
+summary(dados$Umidade)
+outlies = boxplot(dados$Umidade, main='Umidade')
+outlies$out
+hist(dados$Umidade, main='Umidade')
 
-# excluir pelo ID e não pelo Indice
-dados = dados[-c(x$Id),]
+# Obter Mediana
+mediana = median(dados$Umidade, na.rm = T)
+mediana
 
-# Buscamos a linha que estava duplicada
-dados[dados$Id == x$Id,]
+# Verificar dados NA
+dados[!complete.cases(dados$Umidade),]
+dados[is.na(dados$Umidade),]
 
-#verificar novamente os dados duplicados
-dados[duplicated(dados$Id),]
+# Tratar os dados NA 
+dados[is.na(dados$Umidade),]$Umidade = mediana
+
+dados[is.na(dados$Umidade),]
+
+# Verificar dados fora do escopo
+dados[dados$Umidade<0 | dados$Umidade>100,]
+
+# Tratar dados fora do escopo
+dados[dados$Umidade<0 | dados$Umidade>100,]$Umidade = mediana
+dados[dados$Umidade<0 | dados$Umidade>100,]
+
+summary(dados$Umidade)
+
+boxplot(dados$Umidade)
+hist(dados$Umidade)
 
 ```
 
-## Estados fora do dominio
+# Fazer um estudo de regressão linear com Temperatura vs Umidade
+
 
 ```{r}
-# fora do dominio - Categórico
-unique(dados$Estado)
-summary(dados$Estado)
+# Verificar a correlação dos dados
 
-# preencher com a moda
-dados[!dados$Estado %in% c('RS','SC','PR'),]$Estado = 'RS'
-summary(dados$Estado)
+cor(dados[, c('Temperatura','Umidade')])
+corrgram(dados[,c('Temperatura','Umidade')], order=T,
+         lower.panel = panel.shade,
+         upper.panel = panel.pie,
+         text.panel=panel.txt,
+         main='Temperatura X Umidade')
 
-# Removendo fatores não usados
-dados$Estado = factor(dados$Estado)
 
-# Visualizar novamente
-summary(dados$Estado)
-head(dados)
+# Verificar o gráfico de dispersão com a linha de tendência
+plot(dados$Umidade ~dados$Temperatura, ylab='Umidade', xlab='Temperatura', main='Dispersão Temperatura X Umidade')
+
+modelo = lm(Umidade ~ Temperatura, data=dados)
+abline(modelo)
+summary(modelo)
 ```
-
-## Outliers
 
 ```{r}
-#  Outliers, criando um parametro com desvio padrão
-desv = sd(dados$Salario, na.rm=T)
+# Fazendo Previsões
 
-dados[dados$Salario >= 2*desv, ]$Salario
-
-boxplot(dados$Salario)
-        
-x= boxplot(dados$Salario)$out
-x
-
-# atualizamos todos para a mediana
-dados[dados$Salario >= 2*desv,]$Salario = median(dados$Salario)
-
-dados[dados$Salario >= 2*desv, ]$Salario
-
-boxplot(dados$Salario)
+umidade = predict(modelo, data.frame(Temperatura=0))
+umidade
 ```
+# Usando Navie Bayes
+
+## Separar dados de treino
+
+```{r}
+dim(dados)
+amostra = sample(2,14, replace=T, prob=c(0.7, 0.3))
+amostra
+
+jogar_treino = dados[amostra==1,]
+jogar_teste = dados[amostra==2,]
+jogar_teste
+```
+## Criar o modelo
+```{r}
+modelo_bayes = naiveBayes(Jogar ~ ., jogar_treino)
+modelo_bayes
+```
+## Previsão
+
+```{r}
+previsao = predict(modelo_bayes, jogar_teste)
+previsao
+```
+## Matriz de Confusão
+
+```{r}
+confusao = table(jogar_teste$Jogar, previsao)
+confusao
+
+taxa_acerto = (confusao[1] + confusao[4])/sum(confusao)
+taxa_erro = 1 - taxa_acerto
+
+taxa_acerto
+taxa_erro
+```
+
+
+
+
+
+
 
 
 
