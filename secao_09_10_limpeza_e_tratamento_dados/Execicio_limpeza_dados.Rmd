@@ -10,11 +10,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Biblioteca para gráfico de correlação
 # library(corrgram)
-library(corrgram)
+#library(corrgram)
 
 # Biblioteca para modelos de ML
 # install.packages('e1071')
-library(e1071)
+#library(e1071)
 
 ```
 
@@ -38,6 +38,8 @@ summary(dados)
 # Ver valores faltantes
 
 dados[!complete.cases(dados),]
+
+plot(dados)
 ```
 
 

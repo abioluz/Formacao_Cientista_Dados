@@ -1,0 +1,99 @@
+---
+title: "Visualização de dados"
+author: "Abioluz Robson Behrend"
+date: "2023-09-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Histograma 
+
+```{r}
+trees
+dim(trees)
+
+hist(trees$Height)
+hist(trees$Height, main='Arvores', ylab='Frequência', xlab='Altura', col='blue')
+hist(trees$Height, main='Arvores', ylab='Frequência', xlab='Altura', col='blue', density=20, breaks=20)
+
+```
+
+# Densidade
+
+```{r}
+densidade = density(trees$Height)
+plot(densidade)
+```
+
+# Densidade sobre o Histograma, parâmetro par
+
+```{r}
+hist(trees$Height, main=NULL, xlab=NULL, ylab=NULL)
+par(new=T)
+plot(densidade)
+```
+
+# Dispersão
+```{r}
+# trees
+# plot(trees$Girth, trees$Volume)
+plot(trees$Volume ~ trees$Girth, main='Árvore', ylab='Circunferencia', xlab='Volume', col='blue',
+     pch=20)
+
+# Modelo para regressão linear só para estudar
+
+cor(trees)
+
+modelo = lm(Volume ~ Girth, data=trees)
+abline(modelo)
+summary(modelo)
+```
+
+```{r}
+valor = predict(modelo, data.frame(Girth=10))
+valor
+```
+
+# Mudando o tipo
+
+```{r}
+plot(trees$Volume ~ trees$Girth, main='Árvore', ylab='Circunferencia', xlab='Volume', col='blue',
+     pch=20, type='l')
+```
+# Tremulação, diminui sobre posição
+
+```{r}
+plot(jitter(trees$Girth), trees$Volume, ylab='Circunferência', xlab='Volume', col='blue', main='Arvore')
+```
+# Legenda com dimensão categórica
+```{r}
+CO2
+plot(CO2$conc, CO2$uptake, pch=20, col=CO2$Treatment)
+legend('bottomright', legend=c('nonchilled', 'chilled'), cex=1, fill=c('black', 'red'))
+
+```
+# matriz de gráficos
+
+```{r}
+plot(trees)
+```
+# Divisão da tela
+
+```{r}
+# Executar com crt+shit+enter
+
+split.screen(figs=c(2,2))
+screen(1)
+plot(trees$Girth, trees$Volume)
+screen(2)
+plot(trees$Girth, trees$Height)
+screen(3)
+plot(trees$Height, trees$Volume)
+screen(4)
+hist(trees$Volume)
+close.screen(all=T)
+```
+
