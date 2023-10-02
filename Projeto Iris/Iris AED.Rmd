@@ -1,0 +1,164 @@
+---
+title: "Iris AED"
+author: "Abioluz Robson Behrend"
+date: "2023-09-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+install.packages('outliers')
+library(outliers)
+library(lattice)
+library(tigerstats)
+library(BSDA)
+```
+
+# Estudo do Conjunto de Dados Iris - AED
+
+*Um certo dia em 1936, recebi um conjunto de dados de um cientista pedindo para analisar. Me disse que eram um conjunto de medidas de flores e falou que se eu fizesse ele tomaria uma xícara de chá comigo. Assim ele me passou um conjunto de dados em um pendrive.*
+
+Bem não sou eu que tomarei chá com o Fisher e muito menos ele me entregaria um conjunto de dados (de lambuja) para analisar.
+
+Este "artigo" é mais um execício para praticar envolvendo um dataset bem conhecido o conjunto Iris.
+
+Não é um conjunto novo e já foi surrado espancado e se houvesse uma novidade que fugisse de Fisher com certeza já teria sido encontrada. Porém, como estou um pouco ociosos resolvi fazer este exercício para não perder a forma. Assim irei destrinchar esquartejar e esfarelar esta base de dados. Quem sabe consiga um pouco da genialidade dos grandes estatísticos.
+
+## Análise Exploratória de Dados do Conjunto Iris
+
+Como tudo tem um começo, a AED será o meu ponto de partida. Claro que a base de dados já está limpa e perfumada, mas meu intuito é torturar ela até que me conte seus segredos.
+
+```{r}
+# Uma prova que ela já passou por poucas e boas é o fato dela estar de forma nativa no R
+# Conhecendo a base da dados
+head(iris)
+```
+
+### Checagem geral
+
+Primeiro passo é conhecer a dimensão do Dataset.
+
+```{r}
+# Verificanto o tamanho e dimensão do Dataset
+dim(iris)
+```
+
+Note que o dataset possui `r dim(iris)[1]` linhas e `r dim(iris)[2]` colunas. Sendo assim, ele cabe na memória do computador. Também indica que há poucos dados o que pode prejudicar na representatibilidade. 
+
+Agora é verificado a integridade dos dados como um todo.
+
+```{r}
+summary(iris)
+```
+
+As colunas do dataset possui 4 colunas numéricas e uma coluna categórica. Os dados categóricos são divididos em 3 classes com a mesma quantidade cada. sendo assim, farei a análise descritiva separando cada classe para ver como os dados estão se comportando.
+
+## Categoria setosa
+```{r}
+iris_setosa = iris[iris$Species == 'setosa',][1:4]
+
+```
+
+
+### Sepal.Length
+```{r}
+iris_setosa_sl = iris_setosa$Sepal.Length
+summary(iris_setosa_sl)
+sd(iris_setosa_sl)
+
+boxplot(iris_setosa_sl, main='Setosa - Sepal.Length', xlab='Sepal.Length')
+
+hist(iris_setosa_sl, main='Setosa - Sepal.Length', xlab='Sepal.Length')
+par(new=TRUE)
+plot(density(iris_setosa_sl),main='',ylab = "", xlab = "", axes=F, lwd=2.5 ) 
+
+qqnorm(iris_setosa_sl)
+qqline(iris_setosa_sl)
+
+shapiro.test(iris_setosa_sl)
+```
+```{r}
+iris_setosa_sw = iris_setosa$Sepal.Width
+summary(iris_setosa_sw)
+sd(iris_setosa_sw)
+
+
+
+out_sw = boxplot(iris_setosa_sw, main='Setosa - Sepal.Width', xlab='Sepal.Width')
+
+# Verificar se os dados obedecem a curva normal
+
+hist(iris_setosa_sw, main='Setosa - Sepal.Width', xlab='Sepal.Width')
+par(new=TRUE)
+plot(density(iris_setosa_sw),main='',ylab = "", xlab = "", axes=F, lwd=2.5 ) 
+
+qqnorm(iris_setosa_sw)
+qqline(iris_setosa_sw)
+shapiro.test(iris_setosa_sw) # H0: dados nomais >>> p > alfa
+
+
+# Verificar otiliers
+grubbs.test(iris_setosa_sw, type=10, two.sided=F, opposite=T) #H0: Não há outlier nos dados. p>alfa
+grubbs.test(iris_setosa_sw, type=10, two.sided=F, opposite=F) #H0: Não há outlier nos dados. p>alfa
+
+pnormGC(out_sw$out, region='below', m=mean(iris_setosa_sw), s=sd(iris_setosa_sw), graph=T)
+z.test(iris_setosa_sw, mu=out_sw$out, sigma.x=sd(iris_setosa_sw), alternative="greater")
+
+
+
+```
+Nos dados do Setosa - Septal.Width, há um outlie. Um valor de 2.5. A probabilidade de retirar uma medida a baixo de 2.5 é de 0.15%.
+
+
+```{r}
+iris_setosa_pl = iris_setosa$Petal.Length
+summary(iris_setosa_pl)
+
+
+out_pl = boxplot(iris_setosa_pl)
+
+# Verificar a normal
+
+qqnorm(iris_setosa_pl)
+qqline(iris_setosa_pl)
+shapiro.test(iris_setosa_pl)
+
+hist(iris_setosa_pl, main="Setosa - Petal.Lenght", xlab="Petal.Lenght")
+par(new=T)
+plot(density(iris_setosa_pl),xlab='', ylab='', main='', axes=F, lwd=2.5)
+
+# Verificar os outliers
+grubbs.test(iris_setosa_pl)
+grubbs.test(iris_setosa_pl, opposite=T)
+
+pnormGC(out_pl$out, region="below", mean=mean(iris_setosa_pl), s=sd(iris_setosa_pl), graph=T)
+z.test(iris_setosa_pl, mu=out_pl$out,sigma.x = sd(iris_setosa_pl),alternative = "greater")
+```
+
+
+```{r}
+
+
+
+out = boxplot(iris[iris$Species == 'setosa',]$Sepal.Width, main='Setosa - Sepal.Width', xlab='Sepal.Width')
+hist(iris[iris$Species == 'setosa',]$Sepal.Width, main='Setosa - Sepal.Width', xlab='Sepal.Width')
+out
+iris[(iris$Sepal.Width==out$out)&(iris$Species == 'setosa'),]
+
+out = boxplot(iris[iris$Species == 'setosa',]$Petal.Length, main='Setosa - Petal.Length', xlab='Petal.Length')
+hist(iris[iris$Species == 'setosa',]$Petal.Length, main='Setosa - Petal.Length', xlab='Petal.Length')
+out
+iris[(iris$Petal.Length==out$out)&(iris$Species=='setosa'),]
+
+boxplot(iris[iris$Species == 'setosa',]$Sepal.Length, main='Setosa - Sepal.Length', xlab='Sepal.Length')
+hist(iris[iris$Species == 'setosa',]$Sepal.Length, main='Setosa - Sepal.Length', xlab='Sepal.Length')
+
+```
+
+
+
+
+
+
+
+

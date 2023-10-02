@@ -47,6 +47,7 @@ plot(dados)
 
 ```{r}
 aparencia = table(dados$Aparencia)
+aparencia
 barplot(aparencia, main='Aparência', xlab='Aparências')
 print(summary(dados$Aparencia))
 

@@ -1,0 +1,93 @@
+---
+title: "Tabela Normal"
+author: "Abioluz Robson Behrend"
+date: "2023-10-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(tigerstats)
+library(BSDA)
+```
+
+```{r}
+media = 174
+desvio = 8
+# P(x>180)
+
+
+
+# pnorm ver a probabilidade de x ser menor que x
+#pnorm(180, media, desvio)
+
+# pnorm ver a probabilidade de x ser maior que x
+pnorm(180, media, desvio, lower.tail = F)
+
+# Pela fórmula
+z = (180-174)/desvio
+qnorm(pnorm(z))
+qnorm(1- 0.05)
+
+#### Gráfico
+# criar vetores
+x.values = seq(40, 160, 1)
+sd.values = seq(40, 160, 15)
+zeros9 = rep(0,9)
+ggplot(NULL, aes(x=x.values, y=dnorm(x.values, m=100, s=15))) + 
+  geom_line() +
+  labs(x="IQ", y="F(IQ)")
+
+
+pnormGC(c(85,100), region='between', m=100, s=15, graph=T)
+
+```
+
+
+```{r}
+mg.m3 = c(10.25, 10.37, 10.66, 10.47, 10.56, 10.22, 10.44, 10.38, 10.63,
+         10.4, 10.39, 10.26, 10.32, 10.35, 10.54, 10.33, 10.48, 10.48, 10.48,
+         10.68)
+
+z.test(mg.m3,mu=10,sigma.x=0.24)
+
+z.test(c(100,101,104,109,125,116,105,108,110),mu=99,sigma.x=15)
+
+dnorm(1.733)
+pnormGC(dnorm(1.733), region='above', m=100, s=15, graph=T)
+
+mean(c(100,101,104,109,125,116,105,108,110))
+
+mean(10)
+pnorm(111.6,100,10, lower.tail = F)
+
+
+horas = c(
+30, 26, 33, 26,
+26, 33, 31, 31,
+21, 37, 27, 20,
+34, 35, 30, 24,
+38, 34, 39, 31,
+22, 30, 23, 23,
+31, 44, 31, 33,
+33, 26, 27, 28,
+25, 35, 23, 32,
+29, 31, 25, 27)
+
+z.test(horas,sigma.x=7.9, mu=30, conf.level=0.99)
+
+x <- c(7.8, 6.6, 6.5, 7.4, 7.3, 7., 6.4, 7.1, 6.7, 7.6, 6.8)
+y <- c(4.5, 5.4, 6.1, 6.1, 5.4, 5., 4.1, 5.5)
+z.test(x, sigma.x=0.5, y, sigma.y=0.5, mu=2, )
+```
+```{r}
+zsum.test(mean.x=130, mu=135.25, sigma.x=10.5, n.x=25, alternative="less")
+zsum.test(mean.x=130, mu=129, sigma.x=10.5, n.x=25, alternative="less")
+
+```
+
+
+
+
+
